@@ -131,7 +131,7 @@ jobs:
     - name: Installing python3 for legacy builds
       if: env.CHECK_LEGACY_BRANCH == 'true'
       run: |
-        sudo apt-get install python2 python-is-python2
+        sudo apt-get install python3 python-is-python3
 
     - name: Building Image 
       run: |
