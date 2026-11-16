@@ -62,7 +62,7 @@ on:
 jobs:
   build:
     name: Build TWRP by ${{ github.actor }}
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     if: github.event.repository.owner.id == github.event.sender.id
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -70,7 +70,7 @@ jobs:
       contents: write
     steps:
     - name: Check Out
-      uses: actions/checkout@v6
+      uses: actions/checkout@v4
       
     - name: Cleanup
       uses: rokibhasansagar/slimhub_actions@main
@@ -78,11 +78,11 @@ jobs:
     - name: Set Swap Space
       uses: pierotofy/set-swap-space@master
       with:
-        swap-size-gb: 12
+        swap-size-gb: 16
 
     - name: Check Manifest Branch
       run: |
-        if [ ${{ inputs.MANIFEST_BRANCH }} == 'twrp-11' ] || [ ${{ inputs.MANIFEST_BRANCH }} == 'twrp-12.1' ] || [ ${{ inputs.MANIFEST_BRANCH }} == 'twrp-14' ]; then
+        if [ "${{ inputs.MANIFEST_BRANCH }}" == 'twrp-11' ] || [ "${{ inputs.MANIFEST_BRANCH }}" == 'twrp-12.1' ] || [ "${{ inputs.MANIFEST_BRANCH }}" == 'twrp-14' ]; then
             echo "MANIFEST=https://github.com/minimal-manifest-twrp/platform_manifest_twrp_aosp.git" >> $GITHUB_ENV
             echo "CHECK_LEGACY_BRANCH=false" >> $GITHUB_ENV
         else
@@ -104,7 +104,7 @@ jobs:
 
     - name: Install Git-Repo
       run: |
-        mkdir ~/bin
+        mkdir -p ~/bin
         curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
         chmod a+x ~/bin/repo
         sudo ln -sf ~/bin/repo /usr/bin/repo
@@ -121,7 +121,7 @@ jobs:
       run: |
         cd android-recovery
         repo sync -j$(nproc --all) --force-sync
-      
+        
     - name: Clone Device Tree
       run: |
         cd android-recovery
@@ -144,10 +144,10 @@ jobs:
     - name: Set Build Date # Output will be use in Release
       run: |
         echo "BUILD_DATE=$(date +%Y%m%d)" >> $GITHUB_ENV
-      
+        
     - name: Upload to Release
       if: success()
-      uses: softprops/action-gh-release@master
+      uses: softprops/action-gh-release@v2
       with:
         files: |
           android-recovery/out/target/product/${{ inputs.DEVICE_NAME }}/${{ inputs.BUILD_TARGET }}.img
